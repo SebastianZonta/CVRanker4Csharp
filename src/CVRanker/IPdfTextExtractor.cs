@@ -4,4 +4,5 @@ namespace CVRanker;
 public interface IPdfTextExtractor
 {
     PdfExtractionResult Extract(string path);
+    PdfExtractionResult Extract(byte[] pdfBytes);
 }

@@ -1,8 +1,10 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/CVRanker.Api/CVRanker.Api.csproj" />
     <Project Path="src/CVRanker/CVRanker.csproj" />
   </Folder>
   <Folder Name="/test/">
+    <Project Path="test/CVRanker.Api.Tests/CVRanker.Api.Tests.csproj" />
     <Project Path="test/CVRanker.Tests/CVRanker.Tests.csproj" />
   </Folder>
 </Solution>

@@ -9,8 +9,12 @@ public sealed class PdfPigTextExtractor : IPdfTextExtractor
     {
         if (!File.Exists(path))
             throw new FileNotFoundException($"PDF fixture not found: {path}", path);
+        return Extract(File.ReadAllBytes(path));
+    }
 
-        using var document = PdfDocument.Open(path);
+    public PdfExtractionResult Extract(byte[] pdfBytes)
+    {
+        using var document = PdfDocument.Open(pdfBytes);
         var pages = new List<string>(document.NumberOfPages);
         var empty = new List<int>();
 
