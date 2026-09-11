@@ -97,3 +97,11 @@
 /home/coffpa/Desktop/Estudio/Investigacion/CVRankeador/test/CVRanker.Tests/obj/Debug/net10.0/CVRanker.Tests.pdb
 /home/coffpa/Desktop/Estudio/Investigacion/CVRankeador/test/CVRanker.Tests/obj/Debug/net10.0/CVRanker.Tests.genruntimeconfig.cache
 /home/coffpa/Desktop/Estudio/Investigacion/CVRankeador/test/CVRanker.Tests/obj/Debug/net10.0/ref/CVRanker.Tests.dll
+/home/coffpa/Desktop/Estudio/Investigacion/CVRankeador/test/CVRanker.Tests/bin/Debug/net10.0/Fixtures/cv-native.pdf
+/home/coffpa/Desktop/Estudio/Investigacion/CVRankeador/test/CVRanker.Tests/bin/Debug/net10.0/Fixtures/cv-scanned.pdf
+/home/coffpa/Desktop/Estudio/Investigacion/CVRankeador/test/CVRanker.Tests/bin/Debug/net10.0/UglyToad.PdfPig.dll
+/home/coffpa/Desktop/Estudio/Investigacion/CVRankeador/test/CVRanker.Tests/bin/Debug/net10.0/UglyToad.PdfPig.Core.dll
+/home/coffpa/Desktop/Estudio/Investigacion/CVRankeador/test/CVRanker.Tests/bin/Debug/net10.0/UglyToad.PdfPig.Fonts.dll
+/home/coffpa/Desktop/Estudio/Investigacion/CVRankeador/test/CVRanker.Tests/bin/Debug/net10.0/UglyToad.PdfPig.Tokenization.dll
+/home/coffpa/Desktop/Estudio/Investigacion/CVRankeador/test/CVRanker.Tests/bin/Debug/net10.0/UglyToad.PdfPig.Tokens.dll
+/home/coffpa/Desktop/Estudio/Investigacion/CVRankeador/test/CVRanker.Tests/bin/Debug/net10.0/Fixtures/cv-native-2.pdf

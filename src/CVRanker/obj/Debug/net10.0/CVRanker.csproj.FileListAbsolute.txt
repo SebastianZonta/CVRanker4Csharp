@@ -9,3 +9,4 @@
 /home/coffpa/Desktop/Estudio/Investigacion/CVRankeador/src/CVRanker/obj/Debug/net10.0/refint/CVRanker.dll
 /home/coffpa/Desktop/Estudio/Investigacion/CVRankeador/src/CVRanker/obj/Debug/net10.0/CVRanker.pdb
 /home/coffpa/Desktop/Estudio/Investigacion/CVRankeador/src/CVRanker/obj/Debug/net10.0/ref/CVRanker.dll
+/home/coffpa/Desktop/Estudio/Investigacion/CVRankeador/src/CVRanker/obj/Debug/net10.0/CVRanker.csproj.AssemblyReference.cache
