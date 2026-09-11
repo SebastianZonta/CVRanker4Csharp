@@ -18,7 +18,7 @@ public sealed class Bm25Ranker(double k1 = 1.2, double b = 0.75) : IRanker
         if (list.Count == 0)
             return [];
 
-        var weights = offer.Weights ?? ScoringWeights.Default;
+        var weights = offer.EffectiveWeights;
         var must = NormalizeList(offer.MustHave);
         var nice = NormalizeList(offer.NiceToHave);
 
