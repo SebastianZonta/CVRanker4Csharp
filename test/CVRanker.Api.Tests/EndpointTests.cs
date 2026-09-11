@@ -57,6 +57,24 @@ public sealed class EndpointTests : IClassFixture<WebApplicationFactory<Program>
     }
 
     [Fact]
+    public async Task PostRankings_MissingPdf_ReturnsBadRequestInsteadOf500()
+    {
+        var client = _factory.CreateClient();
+        var payload = new
+        {
+            jobDescription = "x",
+            mustHave = Array.Empty<string>(),
+            niceToHave = Array.Empty<string>(),
+            weights = (object?)null,
+            cvs = new[] { new { @ref = "ZZZ", experienceYears = 1.0, hasDegree = false, isSenior = false, hasLanguage = false } },
+        };
+
+        var response = await client.PostAsJsonAsync("/rankings", payload);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
     public async Task PostRankings_FreezesSnapshot_GetReturnsFullViewWithDisclaimer()
     {
         var client = _factory.CreateClient();

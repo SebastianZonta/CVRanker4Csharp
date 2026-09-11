@@ -17,12 +17,22 @@ app.MapPost("/rankings", (
     IPdfTextExtractor extractor,
     IPdfStore pdfs) =>
 {
-    var cvs = request.Cvs.Select(entry =>
+    var cvs = new List<CandidateCv>(request.Cvs.Count);
+    foreach (var entry in request.Cvs)
     {
-        var text = extractor.Extract(pdfs.GetPdf(entry.Ref)).Text;
-        return new CandidateCv(entry.Ref, text, entry.ExperienceYears,
-            entry.HasDegree, entry.IsSenior, entry.HasLanguage);
-    }).ToList();
+        byte[] pdf;
+        try
+        {
+            pdf = pdfs.GetPdf(entry.Ref);
+        }
+        catch (FileNotFoundException e)
+        {
+            return Results.BadRequest($"PDF not found for candidate '{entry.Ref}': {e.FileName}. Check PdfDirectory.");
+        }
+        var text = extractor.Extract(pdf).Text;
+        cvs.Add(new CandidateCv(entry.Ref, text, entry.ExperienceYears,
+            entry.HasDegree, entry.IsSenior, entry.HasLanguage));
+    }
 
     var offer = new Offer(request.JobDescription, request.MustHave, request.NiceToHave, request.Weights);
     var snapshot = new RankingService(ranker, store).Rank(offer, cvs);
