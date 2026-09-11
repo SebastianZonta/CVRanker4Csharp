@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<!-- PROTOTYPE — throwaway, not production. Answers: does scorer v1 (BM25 + must/nice + rules) feel right? -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PROTOTYPE: CV Ranker v1 scorer feel</title>
+<style>
+body{font-family:system-ui,sans-serif;max-width:900px;margin:2rem auto;padding:0 1rem;color:#222}
+.accent{color:#0b5fff}.card{border:1px solid #ddd;border-radius:8px;padding:1rem;margin:1rem 0}
+button{margin:.25rem;padding:.4rem .8rem;cursor:pointer}
+table{border-collapse:collapse;width:100%}td,th{border:1px solid #ddd;padding:.4rem;text-align:left;font-size:.9rem}
+.tabs button.active{background:#0b5fff;color:#fff}
+label{display:block;margin:.3rem 0;font-size:.9rem}
+</style>
+</head>
+<body>
+<h1>PROTOTYPE: CV Ranker v1 <span class="accent"> scorer feel</span></h1>
+<p><b>Question:</b> does the v1 hybrid (BM25 text + must-have/nice-to-have coverage + small rules, weighted 0–100) rank 6 sample CVs against a sample JD in a way that feels right to HR, with visible top-3 reasons? Drag weights (free-play) or run the guided scenarios. Parsing PDF is out of scope here — CVs are pre-extracted text.</p>
+
+<div class="card">
+<h2>Job description (sample)</h2>
+<p id="jd"></p>
+<p><b>Must-have:</b> <span id="must"></span><br><b>Nice-to-have:</b> <span id="nice"></span></p>
+</div>
+
+<div class="card">
+<h2>Free-play: weights (sum need not be 1, auto-normalised)</h2>
+<div id="sliders"></div>
+<p><button onclick="rerank()">Re-rank</button> <button onclick="resetW()">Reset v1 defaults</button></p>
+</div>
+
+<div class="card">
+<h2>Guided walkthroughs</h2>
+<div class="tabs">
+<button id="t0" class="active" onclick="scenario(0)">1 · Happy path</button>
+<button id="t1" onclick="scenario(1)">2 · Must-have missing</button>
+<button id="t2" onclick="scenario(2)">3 · Weight sensitivity</button>
+</div>
+<p id="scdesc"></p>
+<p id="scsteps"></p>
+</div>
+
+<div class="card">
+<h2>Current ranking (re-rendered every click)</h2>
+<div id="out"></div>
+</div>
+
+<script>
+// ---- PURE LOGIC MODULE (liftable; no DOM in here) ----
+const DEFAULTS = {must:.35, bm25:.25, nice:.15, exp:.12, edu:.05, title:.05, lang:.03};
+const JD = {text:"Senior backend engineer. Build C# .NET services on Azure, SQL Server, REST APIs. Must: C#, .NET, REST, SQL. Nice: Azure, Docker, English.",
+  must:["c#",".net","rest","sql"], nice:["azure","docker","english"]};
+const CVS = [
+ {id:"A", text:"Senior C# .NET engineer, 8 years, REST APIs, SQL Server, Azure, Docker, English fluent, BSc CS.",
+  exp:8, edu:1, senior:1, lang:1},
+ {id:"B", text:"Java backend engineer, 6 years, Spring, REST, PostgreSQL, AWS, English. No C#.",
+  exp:6, edu:1, senior:1, lang:1},
+ {id:"C", text:"Junior C# .NET developer, 1 year, REST, SQL basics, Spanish only.",
+  exp:1, edu:1, senior:0, lang:0},
+ {id:"D", text:"Senior C# .NET engineer, 10 years, REST, SQL Server, on-prem, no cloud, English.",
+  exp:10, edu:0, senior:1, lang:1},
+ {id:"E", text:"C# .NET engineer, 4 years, REST, SQL, Azure, English, MSc CS.",
+  exp:4, edu:1, senior:0, lang:1},
+ {id:"F", text:"Python data engineer, 5 years, ETL, SQL, Docker, English. Some C# coursework.",
+  exp:5, edu:1, senior:0, lang:1}];
+function tok(s){return s.toLowerCase().replace(/[^a-z0-9#+. ]/g," ").split(/\s+/).filter(Boolean)}
+function bm25lite(q, d, avglen, k1=1.2, b=0.75){
+  const tf={}; tok(d).forEach(t=>tf[t]=(tf[t]||0)+1);
+  const dl=tok(d).length||1; let s=0;
+  new Set(tok(q)).forEach(t=>{const f=tf[t]||0; if(!f)return;
+    s += (f*(k1+1))/(f+k1*(1-b+b*dl/avglen));});
+  return s;
+}
+function cover(list, doc){const t=new Set(tok(doc)); const hit=list.filter(x=>t.has(x)); return {v:list.length?hit.length/list.length:0, hit}}
+function score(cv, W){
+  const avg=CVS.reduce((a,c)=>a+tok(c.text).length,0)/CVS.length;
+  const b=bm25lite(JD.text, cv.text, avg);
+  const bmax=Math.max(...CVS.map(c=>bm25lite(JD.text,c.text,avg)))||1;
+  const m=cover(JD.must, cv.text), n=cover(JD.nice, cv.text);
+  const f={must:m.v, bm25:b/bmax, nice:n.v, exp:Math.min(cv.exp/10,1), edu:cv.edu, title:cv.senior, lang:cv.lang};
+  let tot=0, wsum=0; for(const k in W){tot+=W[k]*f[k]; wsum+=W[k];}
+  const reasons=[...m.hit.map(h=>"must:"+h), ...n.hit.map(h=>"nice:"+h),
+    "exp:"+cv.exp+"y", cv.edu?"degree":"no-degree"].slice(0,3);
+  return {id:cv.id, total:100*tot/(wsum||1), f, reasons, mustMiss:JD.must.filter(x=>!new Set(tok(cv.text)).has(x))};
+}
+// ---- THIN SHELL (DOM) ----
+let W={...DEFAULTS};
+document.getElementById("jd").textContent=JD.text;
+document.getElementById("must").textContent=JD.must.join(", ");
+document.getElementById("nice").textContent=JD.nice.join(", ");
+const SC=[
+ {d:"Happy path: default v1 weights. Watch: senior C# profiles (A, D, E) top; Java/Python (B, F) mid-low; junior (C) bottom.",
+  s:"Defaults already applied — press Re-rank."},
+ {d:"Edge: candidate B has no C# (must missing). Watch: flagged MUST-MISSING and pushed down, not auto-rejected (veto blando).",
+  s:"Press Re-rank and check B's flag + position."},
+ {d:"Sensitivity: set BM25 weight to 0.60 to simulate text-only ranking. Watch: order shuffles (B/F rise on REST/SQL words) — why coverage weights matter.",
+  s:"Press 'BM25-heavy' below, then Re-rank, then Reset."}];
+function sliders(){
+  const el=document.getElementById("sliders"); el.innerHTML="";
+  for(const k in W){el.innerHTML+=`<label>${k} <input type=range min=0 max=0.6 step=0.05 value=${W[k]} oninput="W['${k}']=parseFloat(this.value)"> <b id="v_${k}">${W[k].toFixed(2)}</b></label>`;}
+  el.innerHTML+=`<button onclick="W={...W,bm25:0.6};sliders();rerank()">BM25-heavy</button>`;
+  setInterval(()=>{for(const k in W){const e=document.getElementById("v_"+k); if(e)e.textContent=W[k].toFixed(2)}},300);
+}
+function rerank(){
+  const r=CVS.map(c=>score(c,W)).sort((a,b)=>b.total-a.total);
+  let h="<table><tr><th>#</th><th>CV</th><th>score</th><th>reasons</th><th>flags</th></tr>";
+  r.forEach((x,i)=>{h+=`<tr><td>${i+1}</td><td>${x.id}</td><td>${x.total.toFixed(1)}</td><td>${x.reasons.join(" · ")}</td><td>${x.mustMiss.length?"MUST-MISSING: "+x.mustMiss.join(","):"—"}</td></tr>`});
+  document.getElementById("out").innerHTML=h+"</table>";
+}
+function resetW(){W={...DEFAULTS}; sliders(); rerank();}
+function scenario(i){
+  [0,1,2].forEach(j=>document.getElementById("t"+j).classList.toggle("active",i===j));
+  document.getElementById("scdesc").textContent=SC[i].d;
+  document.getElementById("scsteps").textContent=SC[i].s;
+  if(i!==2){W={...DEFAULTS}; sliders();}
+  rerank();
+}
+sliders(); scenario(0);
+</script>
+</body>
+</html>
