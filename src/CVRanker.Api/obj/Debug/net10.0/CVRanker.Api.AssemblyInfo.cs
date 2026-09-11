@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CVRanker.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b3b83ad07d43cf6c01552ca926c7d41b1a366417")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f2a8fee6c9ce1a9e66e4f7118e1cce4703f4f4bc")]
 [assembly: System.Reflection.AssemblyProductAttribute("CVRanker.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CVRanker.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
