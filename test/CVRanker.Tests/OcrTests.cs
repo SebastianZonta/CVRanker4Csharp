@@ -58,7 +58,7 @@ public sealed class OcrTests
         var fake = new FakeOcr("should never be used");
         var extractor = new PdfPigTextExtractor(fake);
 
-        var result = extractor.Extract(Fixture("cv-native.pdf"));
+        var result = extractor.Extract(Fixture("DNS.pdf"));
 
         Assert.False(result.NeedsOcr);
         Assert.Equal(0, fake.Calls);

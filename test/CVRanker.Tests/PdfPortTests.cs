@@ -15,7 +15,7 @@ public sealed class PdfPortTests
     public void Extract_NativePdf_ReturnsExpectedTextWordLevel()
     {
         IPdfTextExtractor extractor = new PdfPigTextExtractor();
-        var result = extractor.Extract(Fixture("cv-native.pdf"));
+        var result = extractor.Extract(Fixture("DNS.pdf"));
 
         Assert.False(result.NeedsOcr);
         Assert.Equal(2, result.PageCount);
@@ -24,13 +24,13 @@ public sealed class PdfPortTests
 
         // Word-level extraction: words joined with single spaces, pages in order
         Assert.Equal(
-            "Senior C# .NET engineer with 8 years building REST APIs and SQL Server",
+            "ELENA VIDAL Senior .NET Developer | elena.vidal@example.com | +1 555 015 6678 | Barcelona ES SUMMARY Senior backend engineer with 8 years building C# .NET services on Azure. REST APIs and SQL Server with Docker and English fluent. EXPERIENCE Senior .NET Developer - Kiosko Cloud, Barcelona ES (2021 - Present) - Lead C# .NET services on Azure for billing tenants. - Design REST APIs with versioning and rate limits. - Tune SQL Server queries with execution plan reviews. - Mentor four engineers with design reviews and pairing. .NET Developer - Kiosko Cloud (2018 - 2021) - Built background workers in C# for PDF exports. - Moved file storage from disk to Azure Blob.",
             result.PageTexts[0]);
         Assert.Equal(
-            "Azure Docker English fluent BSc Computer Science",
+            "ELENA VIDAL (continued) Junior .NET Developer - Fabrica Soft, Valencia ES (2016 - 2018) - Fixed WinForms bugs and wrote SQL reports. SKILLS C# .NET REST SQL Server Azure Docker Git English EDUCATION BSc Computer Science, UPC (2012 - 2016). CERTIFICATIONS Azure Developer Associate 2022.",
             result.PageTexts[1]);
         Assert.Equal(
-            "Senior C# .NET engineer with 8 years building REST APIs and SQL Server\nAzure Docker English fluent BSc Computer Science",
+            "ELENA VIDAL Senior .NET Developer | elena.vidal@example.com | +1 555 015 6678 | Barcelona ES SUMMARY Senior backend engineer with 8 years building C# .NET services on Azure. REST APIs and SQL Server with Docker and English fluent. EXPERIENCE Senior .NET Developer - Kiosko Cloud, Barcelona ES (2021 - Present) - Lead C# .NET services on Azure for billing tenants. - Design REST APIs with versioning and rate limits. - Tune SQL Server queries with execution plan reviews. - Mentor four engineers with design reviews and pairing. .NET Developer - Kiosko Cloud (2018 - 2021) - Built background workers in C# for PDF exports. - Moved file storage from disk to Azure Blob.\nELENA VIDAL (continued) Junior .NET Developer - Fabrica Soft, Valencia ES (2016 - 2018) - Fixed WinForms bugs and wrote SQL reports. SKILLS C# .NET REST SQL Server Azure Docker Git English EDUCATION BSc Computer Science, UPC (2012 - 2016). CERTIFICATIONS Azure Developer Associate 2022.",
             result.Text);
     }
 
@@ -38,12 +38,12 @@ public sealed class PdfPortTests
     public void Extract_SecondNativePdf_ReturnsExpectedText()
     {
         IPdfTextExtractor extractor = new PdfPigTextExtractor();
-        var result = extractor.Extract(Fixture("cv-native-2.pdf"));
+        var result = extractor.Extract(Fixture("DBJ.pdf"));
 
         Assert.False(result.NeedsOcr);
         Assert.Equal(1, result.PageCount);
         Assert.Equal(
-            "Java backend engineer with 6 years Spring REST PostgreSQL AWS English",
+            "LUIS HERRERA Junior Database Administrator | luis.herrera@example.com | +1 555 012 7765 | Miami FL SUMMARY Junior Database Administrator with 2 years keeping SQL Server healthy. Backups and T-SQL queries plus monitoring with alerts. Spanish native. EXPERIENCE Junior DBA - Harbor Logistics, Miami FL (2023 - Present) - Ran nightly backups and recovery drills for 20 databases. - Wrote T-SQL reports for inventory and billing teams. - Watched disk space and job failures during business hours. SKILLS SQL Server T-SQL Backups Monitoring Spanish EDUCATION Technical Diploma in Databases, Miami Dade College (2021 - 2023).",
             result.Text);
     }
 
@@ -70,7 +70,7 @@ public sealed class PdfPortTests
     {
         // Pilot wiring: path-loaded text plugs straight into the scorer
         IPdfTextExtractor extractor = new PdfPigTextExtractor();
-        var extracted = extractor.Extract(Fixture("cv-native.pdf"));
+        var extracted = extractor.Extract(Fixture("DNS.pdf"));
         var offer = new Offer(
             "Senior backend engineer with C# .NET REST SQL Azure",
             ["c#", ".net", "rest", "sql"],

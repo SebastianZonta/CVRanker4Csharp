@@ -16,8 +16,8 @@ public sealed class EndpointTests : IClassFixture<WebApplicationFactory<Program>
     {
         _pdfDir = Path.Combine(Path.GetTempPath(), "cvranker-tests", Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(_pdfDir);
-        File.Copy(Fixture("cv-native.pdf"), Path.Combine(_pdfDir, "A.pdf"));
-        File.Copy(Fixture("cv-native-2.pdf"), Path.Combine(_pdfDir, "B.pdf"));
+        File.Copy(Fixture("DNS.pdf"), Path.Combine(_pdfDir, "A.pdf"));
+        File.Copy(Fixture("DBJ.pdf"), Path.Combine(_pdfDir, "B.pdf"));
         _factory = factory.WithWebHostBuilder(b => b.UseSetting("PdfDirectory", _pdfDir));
     }
 
@@ -43,7 +43,7 @@ public sealed class EndpointTests : IClassFixture<WebApplicationFactory<Program>
         cvs = new[]
         {
             new { @ref = "A", experienceYears = 8.0, hasDegree = true, isSenior = true, hasLanguage = true },
-            new { @ref = "B", experienceYears = 6.0, hasDegree = true, isSenior = true, hasLanguage = true },
+            new { @ref = "B", experienceYears = 2.0, hasDegree = true, isSenior = false, hasLanguage = false },
         },
     };
 

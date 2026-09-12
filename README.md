@@ -57,8 +57,8 @@ Set it up with the bundled fixtures (any English text PDFs work):
 
 ```bash
 mkdir -p /tmp/pdfs
-cp test/CVRanker.Tests/Fixtures/cv-native.pdf /tmp/pdfs/A.pdf
-cp test/CVRanker.Tests/Fixtures/cv-native-2.pdf /tmp/pdfs/B.pdf
+cp test/CVRanker.Tests/Fixtures/DNS.pdf /tmp/pdfs/A.pdf
+cp test/CVRanker.Tests/Fixtures/DBJ.pdf /tmp/pdfs/B.pdf
 ls /tmp/pdfs   # A.pdf  B.pdf — names must match the refs in your request
 ```
 
