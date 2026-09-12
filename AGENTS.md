@@ -31,6 +31,6 @@ Single-context layout (`CONTEXT.md` + `docs/adr/` at repo root). See `docs/agent
 
 - PDFs resolve as `<PdfDirectory>/<ref>.pdf` (default dir `pdfs`, relative to CWD). Missing file → `400` on POST with the looked-for path, `404` on PDF GET.
 - Test fixtures live in `test/CVRanker.Tests/Fixtures/` (copied to output; API tests copy them to a temp dir as `{ref}.pdf`).
-- Tokenizer keeps trailing periods (`c#.` ≠ `c#`) — prototype fidelity, not a bug. Behavior reference: `.scratch/cv-ranker/prototype/scorer-v1.html`.
+- Tokenizer keeps trailing periods (`c#.` ≠ `c#`) — prototype fidelity, not a bug. Behavior reference: `.scratch/cv-ranker/prototype/scorer-v1.html`. Offer must-have/nice-to-have entries additionally trim trailing periods when matching, so HR-typed `C#.` matches CV term `c#` (see `.scratch/scoring-depth/spec.md`); doc-side tokens keep prototype behavior.
 - `UglyToad.PdfPig` is only available as prerelease on this feed: `dotnet add package UglyToad.PdfPig --prerelease`. That version has no `PdfDocumentBuilder`, so generate fixture PDFs with PyMuPDF.
 - Tests assert external behavior (order/scores/reasons/flags for fixed inputs), never BM25 internals.
