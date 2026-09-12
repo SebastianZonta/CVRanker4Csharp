@@ -34,9 +34,9 @@ public sealed class RankingViewTests
     }
 
     [Fact]
-    public void FromSnapshot_ProjectsFullViewWithDisclaimerAndBanner()
+    public void ToRankingView_ProjectsFullViewWithDisclaimerAndBanner()
     {
-        var view = RankingViewMapper.FromSnapshot(SampleSnapshot());
+        var view = SampleSnapshot().ToRankingView();
 
         Assert.Equal(3, view.Items.Count);
         Assert.Equal(CVRanker.Contracts.Responses.Rankings.RankingView.SupportToolDisclaimer, view.Disclaimer);
@@ -52,18 +52,18 @@ public sealed class RankingViewTests
     }
 
     [Fact]
-    public void FromSnapshot_MustCompleteOnly_HidesFlaggedCandidates()
+    public void ToRankingView_MustCompleteOnly_HidesFlaggedCandidates()
     {
-        var view = RankingViewMapper.FromSnapshot(SampleSnapshot(), mustCompleteOnly: true);
+        var view = SampleSnapshot().ToRankingView(mustCompleteOnly: true);
 
         Assert.All(view.Items, i => Assert.False(i.HasMustMissing));
         Assert.DoesNotContain(view.Items, i => i.CvRef == "B");
     }
 
     [Fact]
-    public void FromSnapshot_Keyword_FiltersByCvText()
+    public void ToRankingView_Keyword_FiltersByCvText()
     {
-        var view = RankingViewMapper.FromSnapshot(SampleSnapshot(), keyword: "azure");
+        var view = SampleSnapshot().ToRankingView(keyword: "azure");
 
         Assert.Contains(view.Items, i => i.CvRef == "A");
         Assert.DoesNotContain(view.Items, i => i.CvRef == "B");
@@ -73,7 +73,7 @@ public sealed class RankingViewTests
     public void ViewModel_SerializesWithoutPersonalFields()
     {
         // Anonymization is structural: no name/photo/age/gender/address fields exist anywhere in the view.
-        var json = JsonSerializer.Serialize(RankingViewMapper.FromSnapshot(SampleSnapshot())).ToLowerInvariant();
+        var json = JsonSerializer.Serialize(SampleSnapshot().ToRankingView()).ToLowerInvariant();
 
         foreach (var field in new[] { "name", "photo", "age", "gender", "address", "direcci", "edad", "sexo", "foto", "nombre" })
             Assert.DoesNotContain($"\"{field}\"", json);

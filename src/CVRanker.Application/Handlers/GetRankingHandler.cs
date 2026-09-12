@@ -7,5 +7,5 @@ namespace CVRanker.Application.Handlers;
 public sealed class GetRankingHandler(ISnapshotStore store)
 {
     public RankingView Handle(string snapshotId, bool mustCompleteOnly = false, string? keyword = null) =>
-        RankingViewMapper.FromSnapshot(store.Get(snapshotId), mustCompleteOnly, keyword);
+        store.Get(snapshotId).ToRankingView(mustCompleteOnly, keyword);
 }

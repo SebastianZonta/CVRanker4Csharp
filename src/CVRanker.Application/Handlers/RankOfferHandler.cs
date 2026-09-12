@@ -28,9 +28,9 @@ public sealed class RankOfferHandler(
             {
                 throw new CandidatePdfNotFoundException(entry.Ref, e.FileName);
             }
-            cvs.Add(OfferMapper.ToCandidate(entry, extractor.Extract(pdf).Text));
+            cvs.Add(entry.ToCandidate(extractor.Extract(pdf).Text));
         }
-        var offer = OfferMapper.ToOffer(request);
+        var offer = request.ToOffer();
         var frozenCvs = cvs.ToList();
         var results = ranker.Rank(offer, frozenCvs).ToList();
 

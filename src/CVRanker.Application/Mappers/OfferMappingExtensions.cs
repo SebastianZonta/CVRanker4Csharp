@@ -4,9 +4,9 @@ using CVRanker.Domain;
 
 namespace CVRanker.Application.Mappers;
 
-public static class OfferMapper
+public static class OfferMappingExtensions
 {
-    public static Offer ToOffer(RankRequest request)
+    public static Offer ToOffer(this RankRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
         ScoringWeights? weights = request.Weights is null ? null : new ScoringWeights(
@@ -16,7 +16,7 @@ public static class OfferMapper
         return new Offer(request.JobDescription, request.MustHave.ToList(), request.NiceToHave.ToList(), weights);
     }
 
-    public static CandidateCv ToCandidate(CvEntry entry, string text)
+    public static CandidateCv ToCandidate(this CvEntry entry, string text)
     {
         ArgumentNullException.ThrowIfNull(entry);
         return new CandidateCv(entry.Ref, text, entry.ExperienceYears,

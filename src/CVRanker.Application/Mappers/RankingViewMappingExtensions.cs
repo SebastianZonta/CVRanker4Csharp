@@ -3,10 +3,10 @@ using CVRanker.Domain;
 
 namespace CVRanker.Application.Mappers;
 
-public static class RankingViewMapper
+public static class RankingViewMappingExtensions
 {
-    public static RankingView FromSnapshot(
-        RankingSnapshot snapshot,
+    public static RankingView ToRankingView(
+        this RankingSnapshot snapshot,
         bool mustCompleteOnly = false,
         string? keyword = null)
     {
