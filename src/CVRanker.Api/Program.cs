@@ -25,6 +25,9 @@ app.MapPost("/rankings", (RankRequest request, RankOfferHandler handler) =>
 });
 
 // Frozen ranking view with HR filters.
+app.MapGet("/rankings", (ListSnapshotsHandler handler) =>
+    Results.Ok(handler.Handle()));
+
 app.MapGet("/rankings/{id}", (
     string id,
     GetRankingHandler handler,

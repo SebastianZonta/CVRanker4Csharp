@@ -16,4 +16,7 @@ public sealed class InMemorySnapshotStore : ISnapshotStore
         _snapshots.TryGetValue(id, out var snapshot)
             ? snapshot
             : throw new KeyNotFoundException($"Snapshot not found: {id}");
+
+    public IReadOnlyList<RankingSnapshot> List() =>
+        _snapshots.Values.OrderBy(s => s.CreatedAt).ToList();
 }

@@ -11,5 +11,6 @@ public static class ServiceCollectionExtensions
             .AddSingleton<IRanker, Bm25Ranker>()
             .AddSingleton<RankOfferHandler>()
             .AddSingleton<GetRankingHandler>()
+            .AddSingleton<ListSnapshotsHandler>()
             .AddSingleton<GetCandidatePdfHandler>();
 }
