@@ -4,6 +4,7 @@
     <Project Path="src/CVRanker.Application/CVRanker.Application.csproj" />
     <Project Path="src/CVRanker.Contracts/CVRanker.Contracts.csproj" />
     <Project Path="src/CVRanker.Domain/CVRanker.Domain.csproj" />
+    <Project Path="src/CVRanker.Infrastructure/CVRanker.Infrastructure.csproj" />
     <Project Path="src/CVRanker/CVRanker.csproj" />
   </Folder>
   <Folder Name="/test/">

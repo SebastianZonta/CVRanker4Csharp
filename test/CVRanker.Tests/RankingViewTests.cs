@@ -1,5 +1,5 @@
 using CVRanker.Application.Mappers;
-using CVRanker;
+using CVRanker.Infrastructure;
 using CVRanker.Application;
 using CVRanker.Contracts.Responses.Rankings;
 using CVRanker.Domain;

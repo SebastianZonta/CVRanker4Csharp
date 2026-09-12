@@ -3,14 +3,11 @@ using CVRanker.Application.Handlers;
 using CVRanker.Contracts.Requests.Rankings;
 using CVRanker.Contracts.Responses.Rankings;
 using CVRanker.Domain;
-using CVRanker;
+using CVRanker.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApplication();
-builder.Services.AddSingleton<ISnapshotStore, InMemorySnapshotStore>();
-builder.Services.AddSingleton<IPdfTextExtractor, PdfPigTextExtractor>();
-builder.Services.AddSingleton<IPdfStore>(sp =>
-    new DirectoryPdfStore(sp.GetRequiredService<IConfiguration>()["PdfDirectory"] ?? "pdfs"));
+builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 

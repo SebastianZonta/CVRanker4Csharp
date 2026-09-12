@@ -1,6 +1,6 @@
 using CVRanker.Application;
 using CVRanker.Domain;
-namespace CVRanker;
+namespace CVRanker.Infrastructure;
 
 public sealed class InMemorySnapshotStore : ISnapshotStore
 {

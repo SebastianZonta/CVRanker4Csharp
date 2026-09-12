@@ -1,6 +1,6 @@
 using CVRanker.Application;
 using CVRanker.Domain;
-namespace CVRanker;
+namespace CVRanker.Infrastructure;
 
 public sealed class DirectoryPdfStore(string directory) : IPdfStore
 {

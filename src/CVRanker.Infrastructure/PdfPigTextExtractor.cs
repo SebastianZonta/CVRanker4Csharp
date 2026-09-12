@@ -1,9 +1,10 @@
 using CVRanker.Application;
 using CVRanker.Application;
+using CVRanker.Application;
 using CVRanker.Domain;
 using UglyToad.PdfPig;
 
-namespace CVRanker;
+namespace CVRanker.Infrastructure;
 
 /// <summary>PdfPig word-level extraction (never raw page text). Pages with zero words route to the OCR queue (Tesseract, out of slice).</summary>
 public sealed class PdfPigTextExtractor : IPdfTextExtractor

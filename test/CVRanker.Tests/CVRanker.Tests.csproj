@@ -22,6 +22,7 @@
     <ProjectReference Include="..\..\src\CVRanker\CVRanker.csproj" />
     <ProjectReference Include="..\..\src\CVRanker.Contracts\CVRanker.Contracts.csproj" />
     <ProjectReference Include="..\..\src\CVRanker.Application\CVRanker.Application.csproj" />
+    <ProjectReference Include="..\..\src\CVRanker.Infrastructure\CVRanker.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
