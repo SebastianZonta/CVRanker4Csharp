@@ -12,7 +12,7 @@ No paid LLM APIs. Scoring is a weighted hybrid lifted from `prototype/scorer-v1.
 |---|---|---|
 | `src/CVRanker.Domain` | Ranking aggregate, scorer (`IRanker` seam), metrics + calibration. References nothing | — |
 | `src/CVRanker.Contracts` | HTTP DTOs: `Requests/<entity>/`, `Responses/<entity>/`. References nothing | — |
-| `src/CVRanker.Application` | Ports, 3 CQRS handlers, Contracts↔Domain mappers, `AddApplication()` | Domain, Contracts |
+| `src/CVRanker.Application` | Ports, 3 handlers (`RankOffer`/`GetRanking`/`GetCandidatePdf`), Contracts↔Domain mappers as extension methods (`request.ToOffer()`, `snapshot.ToRankingView(...)`), `AddApplication()` | Domain, Contracts |
 | `src/CVRanker.Infrastructure` | Adapters (PdfPig extraction, PDF/file stores), `AddInfrastructure(config)` | Application |
 | `src/CVRanker.Api` | Minimal API: thin endpoints over handlers (composition root) | Application, Infrastructure, Contracts |
 | `test/CVRanker.Tests` | 26 unit/behavior tests + PDF fixtures in `Fixtures/` | — |
