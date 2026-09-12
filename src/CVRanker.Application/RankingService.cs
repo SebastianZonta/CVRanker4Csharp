@@ -1,5 +1,5 @@
 using CVRanker.Domain;
-namespace CVRanker;
+namespace CVRanker.Application;
 
 /// <summary>"Rankear" button: ranks once, freezes the snapshot, stores it. No auto re-rank.</summary>
 public sealed class RankingService(IRanker ranker, ISnapshotStore store, string scorerVersion = Bm25Ranker.ScorerVersion)

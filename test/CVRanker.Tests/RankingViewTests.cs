@@ -1,4 +1,6 @@
+using CVRanker.Application.Mappers;
 using CVRanker;
+using CVRanker.Application;
 using CVRanker.Contracts.Responses.Rankings;
 using CVRanker.Domain;
 using System.Text.Json;
@@ -27,7 +29,7 @@ public sealed class RankingViewTests
     [Fact]
     public void FromSnapshot_ProjectsFullViewWithDisclaimerAndBanner()
     {
-        var view = RankingViews.FromSnapshot(SampleSnapshot());
+        var view = RankingViewMapper.FromSnapshot(SampleSnapshot());
 
         Assert.Equal(3, view.Items.Count);
         Assert.Equal(CVRanker.Contracts.Responses.Rankings.RankingView.SupportToolDisclaimer, view.Disclaimer);
@@ -45,7 +47,7 @@ public sealed class RankingViewTests
     [Fact]
     public void FromSnapshot_MustCompleteOnly_HidesFlaggedCandidates()
     {
-        var view = RankingViews.FromSnapshot(SampleSnapshot(), mustCompleteOnly: true);
+        var view = RankingViewMapper.FromSnapshot(SampleSnapshot(), mustCompleteOnly: true);
 
         Assert.All(view.Items, i => Assert.False(i.HasMustMissing));
         Assert.DoesNotContain(view.Items, i => i.CvRef == "B");
@@ -54,7 +56,7 @@ public sealed class RankingViewTests
     [Fact]
     public void FromSnapshot_Keyword_FiltersByCvText()
     {
-        var view = RankingViews.FromSnapshot(SampleSnapshot(), keyword: "azure");
+        var view = RankingViewMapper.FromSnapshot(SampleSnapshot(), keyword: "azure");
 
         Assert.Contains(view.Items, i => i.CvRef == "A");
         Assert.DoesNotContain(view.Items, i => i.CvRef == "B");
@@ -64,7 +66,7 @@ public sealed class RankingViewTests
     public void ViewModel_SerializesWithoutPersonalFields()
     {
         // Anonymization is structural: no name/photo/age/gender/address fields exist anywhere in the view.
-        var json = JsonSerializer.Serialize(RankingViews.FromSnapshot(SampleSnapshot())).ToLowerInvariant();
+        var json = JsonSerializer.Serialize(RankingViewMapper.FromSnapshot(SampleSnapshot())).ToLowerInvariant();
 
         foreach (var field in new[] { "name", "photo", "age", "gender", "address", "direcci", "edad", "sexo", "foto", "nombre" })
             Assert.DoesNotContain($"\"{field}\"", json);

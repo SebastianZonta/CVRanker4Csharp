@@ -1,5 +1,5 @@
 using CVRanker.Domain;
-namespace CVRanker;
+namespace CVRanker.Application;
 
 public sealed record PdfExtractionResult(
     string Text,

@@ -1,3 +1,5 @@
+using CVRanker.Application;
+using CVRanker.Application;
 using CVRanker.Domain;
 using UglyToad.PdfPig;
 

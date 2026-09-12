@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CVRanker\CVRanker.csproj" />
     <ProjectReference Include="..\CVRanker.Contracts\CVRanker.Contracts.csproj" />
+    <ProjectReference Include="..\CVRanker.Application\CVRanker.Application.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

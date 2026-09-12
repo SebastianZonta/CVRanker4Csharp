@@ -1,3 +1,5 @@
+using CVRanker.Application;
+using CVRanker;
 using CVRanker.Domain;
 namespace CVRanker.Tests;
 

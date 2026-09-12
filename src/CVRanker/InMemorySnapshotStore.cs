@@ -1,3 +1,4 @@
+using CVRanker.Application;
 using CVRanker.Domain;
 namespace CVRanker;
 

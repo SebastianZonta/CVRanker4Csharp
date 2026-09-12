@@ -1,0 +1,43 @@
+using CVRanker.Application.Mappers;
+using CVRanker.Contracts.Requests.Rankings;
+using CVRanker.Contracts.Responses.Rankings;
+using CVRanker.Domain;
+
+namespace CVRanker.Application.Handlers;
+
+/// <summary>Rank-once flow: extract PDFs by ref, freeze the snapshot. No auto re-rank.</summary>
+public sealed class RankOfferHandler(
+    IRanker ranker,
+    ISnapshotStore store,
+    IPdfTextExtractor extractor,
+    IPdfStore pdfs)
+{
+    private readonly RankingService _service = new(ranker, store);
+
+    public RankResponse Handle(RankRequest request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        var cvs = new List<CandidateCv>(request.Cvs.Count);
+        foreach (var entry in request.Cvs)
+        {
+            byte[] pdf;
+            try
+            {
+                pdf = pdfs.GetPdf(entry.Ref);
+            }
+            catch (FileNotFoundException e)
+            {
+                throw new CandidatePdfNotFoundException(entry.Ref, e.FileName);
+            }
+            cvs.Add(OfferMapper.ToCandidate(entry, extractor.Extract(pdf).Text));
+        }
+        var snapshot = _service.Rank(OfferMapper.ToOffer(request), cvs);
+        return new RankResponse(snapshot.Id);
+    }
+}
+
+public sealed class CandidatePdfNotFoundException(string cvRef, string? path)
+    : FileNotFoundException($"PDF not found for candidate '{cvRef}': {path}. Check PdfDirectory.", path)
+{
+    public string CvRef { get; } = cvRef;
+}

@@ -1,10 +1,9 @@
 using CVRanker.Contracts.Responses.Rankings;
 using CVRanker.Domain;
 
-namespace CVRanker;
+namespace CVRanker.Application.Mappers;
 
-/// <summary>Temporary home for the snapshot→view projection; moves to Application mappers in step 3.</summary>
-public static class RankingViews
+public static class RankingViewMapper
 {
     public static RankingView FromSnapshot(
         RankingSnapshot snapshot,

@@ -1,5 +1,5 @@
 using CVRanker.Domain;
-namespace CVRanker;
+namespace CVRanker.Application;
 
 /// <summary>PDF text-extraction port (PdfPig now, OCR fallback later). Pilot loads by path; production reads Azure blob.</summary>
 public interface IPdfTextExtractor
