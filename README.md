@@ -21,9 +21,15 @@ No paid LLM APIs. Scoring is a weighted hybrid lifted from `prototype/scorer-v1.
 ## Prerequisites
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download) (`dotnet --version` → `10.x`)
-- `tesseract-ocr` 5.x with English data (only needed for scanned PDFs; native-text PDFs work without it):
-  `sudo apt-get install -y tesseract-ocr tesseract-ocr-eng`. The app pins `tessdata/eng` shipped in
-  `src/CVRanker.Infrastructure/tessdata` via `--tessdata-dir` (`Ocr:TessDataPath` overrides).
+- `tesseract-ocr` 5.x with English data (only needed for scanned PDFs; native-text PDFs work without it).
+  The app pins `tessdata/eng` shipped in `src/CVRanker.Infrastructure/tessdata` via `--tessdata-dir`
+  (`Ocr:TessDataPath` overrides, `Ocr:CliPath` overrides the binary location).
+  - **Linux**: `sudo apt-get install -y tesseract-ocr tesseract-ocr-eng`
+  - **Windows 11**: installer from [UB-Mannheim/tesseract](https://github.com/UB-Mannheim/tesseract/wiki)
+    (latest 5.x `tesseract-ocr-w64-setup-*.exe`) or `choco install tesseract`. The installer no longer
+    touches PATH, so either add its folder to PATH manually or point the app at it:
+    `"Ocr:CliPath": "C:\\Program Files\\Tesseract-OCR\\tesseract.exe"`. Then `tesseract --version`
+    in a new terminal.
 
 ## Verify everything works
 
