@@ -70,7 +70,7 @@ public static class WeightCalibrator
         return new CalibrationResult(bestWeights, bestK1, bestB);
     }
 
-    public static double MeanObjective(IReadOnlyList<PilotCase> cases, Bm25Ranker ranker, ScoringWeights weights)
+    public static double MeanObjective(IReadOnlyList<PilotCase> cases, IRanker ranker, ScoringWeights weights)
     {
         double total = 0;
         foreach (var c in cases)

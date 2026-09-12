@@ -124,4 +124,29 @@ public sealed class PilotTests
         Assert.Equal(1.0, result.Mrr, precision: 9);
         Assert.Equal(0.5, result.TriageSaving, precision: 9); // 1 - 2/4
     }
+
+    [Fact]
+    public void Calibrator_MeanObjective_AcceptsAnyRanker()
+    {
+        var offer = new Offer("C# backend", ["c#"], [], ScoringWeights.Default);
+        var cvs = new List<CandidateCv>
+        {
+            new("H", "C# developer", 5, HasDegree: true, IsSenior: false, HasLanguage: true),
+            new("D", "Go developer", 5, HasDegree: true, IsSenior: false, HasLanguage: true),
+        };
+        var cases = new List<PilotCase>
+        {
+            new(offer, cvs, new Dictionary<string, int> { ["H"] = 3, ["D"] = 0 }),
+        };
+        IRanker stub = new FixedOrderRanker(["H", "D"]);
+
+        // Ideal order first: P@10 = 1/10, NDCG@10 = 1
+        Assert.Equal(1.1, WeightCalibrator.MeanObjective(cases, stub, ScoringWeights.Default), precision: 9);
+    }
+
+    private sealed class FixedOrderRanker(IReadOnlyList<string> order) : IRanker
+    {
+        public IReadOnlyList<RankedCandidate> Rank(Offer offer, IEnumerable<CandidateCv> cvs) =>
+            order.Select((id, i) => new RankedCandidate(id, i + 1, 0, [], [], new FeatureBreakdown(0, 0, 0, 0, 0, 0, 0))).ToList();
+    }
 }
