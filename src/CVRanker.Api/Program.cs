@@ -1,3 +1,5 @@
+using CVRanker.Contracts.Requests.Rankings;
+using CVRanker.Contracts.Responses.Rankings;
 using CVRanker.Domain;
 using CVRanker;
 
@@ -35,7 +37,11 @@ app.MapPost("/rankings", (
             entry.HasDegree, entry.IsSenior, entry.HasLanguage));
     }
 
-    var offer = new Offer(request.JobDescription, request.MustHave, request.NiceToHave, request.Weights);
+    var weights = request.Weights is null ? null : new ScoringWeights(
+        request.Weights.Must, request.Weights.Bm25, request.Weights.Nice,
+        request.Weights.Experience, request.Weights.Education,
+        request.Weights.Title, request.Weights.Languages);
+    var offer = new Offer(request.JobDescription, request.MustHave, request.NiceToHave, weights);
     var snapshot = new RankingService(ranker, store).Rank(offer, cvs);
     return Results.Ok(new RankResponse(snapshot.Id));
 });
@@ -50,7 +56,7 @@ app.MapGet("/rankings/{id}", (
     var snapshot = RequireSnapshot(id, store);
     return snapshot is null
         ? Results.NotFound()
-        : Results.Ok(RankingView.FromSnapshot(snapshot, mustComplete ?? false, q));
+        : Results.Ok(RankingViews.FromSnapshot(snapshot, mustComplete ?? false, q));
 });
 
 // Original PDF behind the blind-phase banner.
@@ -89,21 +95,5 @@ static RankingSnapshot? RequireSnapshot(string id, ISnapshotStore store)
         return null;
     }
 }
-
-public sealed record CvEntry(
-    string Ref,
-    double ExperienceYears,
-    bool HasDegree,
-    bool IsSenior,
-    bool HasLanguage);
-
-public sealed record RankRequest(
-    string JobDescription,
-    IReadOnlyList<string> MustHave,
-    IReadOnlyList<string> NiceToHave,
-    ScoringWeights? Weights,
-    IReadOnlyList<CvEntry> Cvs);
-
-public sealed record RankResponse(string SnapshotId);
 
 public partial class Program;

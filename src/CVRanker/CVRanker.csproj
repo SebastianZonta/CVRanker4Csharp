@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CVRanker.Domain\CVRanker.Domain.csproj" />
+    <ProjectReference Include="..\CVRanker.Contracts\CVRanker.Contracts.csproj" />
   </ItemGroup>
 
 </Project>
