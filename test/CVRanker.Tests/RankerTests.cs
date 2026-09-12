@@ -130,4 +130,134 @@ public sealed class RankerTests
             @default.Select(r => Math.Round(r.Score, 4)),
             heavy.Select(r => Math.Round(r.Score, 4)));
     }
+
+    [Fact]
+    public void Rank_MustEntryVariants_MatchTheSameTerms()
+    {
+        var ranker = new Bm25Ranker();
+        var offer = new Offer(
+            JobDescription: "Backend engineer role.",
+            MustHave: ["C#.", "(C#)", "NODE.JS", "---"],
+            NiceToHave: [],
+            Weights: ScoringWeights.Default);
+        var cvs = new List<CandidateCv>
+        {
+            new("A", "Senior c# developer building node.js services, 5 years, degree.", 5, HasDegree: true, IsSenior: false, HasLanguage: false),
+        };
+
+        var ranked = ranker.Rank(offer, cvs);
+
+        var a = Assert.Single(ranked);
+        Assert.False(a.HasMustMissing);
+        Assert.Empty(a.MissingMust);
+        Assert.Contains("must:c#", a.TopReasons);
+        Assert.Contains("must:node.js", a.TopReasons);
+        Assert.Equal(1.0, a.Breakdown.Must);
+    }
+
+    [Fact]
+    public void Rank_NiceEntryVariants_LiftWithoutSinking()
+    {
+        var ranker = new Bm25Ranker();
+        var offer = new Offer(
+            JobDescription: "Backend engineer role.",
+            MustHave: [],
+            NiceToHave: ["AZURE.", "(Docker)"],
+            Weights: ScoringWeights.Default);
+        var cvs = new List<CandidateCv>
+        {
+            new("A", "Engineer working with azure and docker daily, 3 years.", 3, HasDegree: false, IsSenior: false, HasLanguage: false),
+            new("B", "Engineer working with on-prem servers only, 3 years.", 3, HasDegree: false, IsSenior: false, HasLanguage: false),
+        };
+
+        var ranked = ranker.Rank(offer, cvs);
+
+        Assert.Equal("A", ranked[0].CvId);
+        Assert.Contains("nice:azure", ranked[0].TopReasons);
+        Assert.All(ranked, r => Assert.False(r.HasMustMissing));
+    }
+
+    [Fact]
+    public void Rank_MultiWordEntry_MatchesOnlyWhenAllTermsPresent()
+    {
+        var ranker = new Bm25Ranker();
+        var offer = new Offer(
+            JobDescription: "Database role.",
+            MustHave: ["sql server"],
+            NiceToHave: [],
+            Weights: ScoringWeights.Default);
+        var cvs = new List<CandidateCv>
+        {
+            new("FULL", "SQL Server DBA, backups and tuning, 6 years.", 6, HasDegree: false, IsSenior: false, HasLanguage: false),
+            new("PARTIAL", "MySQL analyst, reporting queries, 6 years.", 6, HasDegree: false, IsSenior: false, HasLanguage: false),
+        };
+
+        var ranked = ranker.Rank(offer, cvs);
+
+        var full = ranked.Single(r => r.CvId == "FULL");
+        var partial = ranked.Single(r => r.CvId == "PARTIAL");
+        Assert.False(full.HasMustMissing);
+        Assert.Equal(["sql server"], partial.MissingMust);
+    }
+
+    [Fact]
+    public void Rank_NegativeExperienceYears_ClampsToZero()
+    {
+        var ranker = new Bm25Ranker();
+        var ranked = ranker.Rank(SampleOffer(), SampleCvs().Concat(
+        [
+            new CandidateCv("N", "Senior C# .NET engineer, REST, SQL, Azure, English.", -4, HasDegree: true, IsSenior: true, HasLanguage: true),
+        ]).ToList());
+
+        var n = ranked.Single(r => r.CvId == "N");
+        Assert.Equal(0.0, n.Breakdown.Experience);
+        Assert.InRange(n.Score, 0, 100);
+    }
+
+    [Fact]
+    public void Rank_EmptyDescriptionAndLists_RanksStablyWithoutFlags()
+    {
+        var ranker = new Bm25Ranker();
+        var offer = new Offer(JobDescription: "", MustHave: [], NiceToHave: [], Weights: ScoringWeights.Default);
+
+        var ranked = ranker.Rank(offer, SampleCvs());
+
+        Assert.Equal(6, ranked.Count);
+        Assert.Equal([1, 2, 3, 4, 5, 6], ranked.Select(r => r.Rank).ToArray());
+        Assert.All(ranked, r =>
+        {
+            Assert.InRange(r.Score, 0, 100);
+            Assert.False(r.HasMustMissing);
+        });
+    }
+
+    [Fact]
+    public void Rank_EmptyCvText_TailsLastWithZeroMustCoverage()
+    {
+        var ranker = new Bm25Ranker();
+        var ranked = ranker.Rank(SampleOffer(), SampleCvs().Concat(
+        [
+            new CandidateCv("VOID", "", 5, HasDegree: true, IsSenior: false, HasLanguage: true),
+        ]).ToList());
+
+        var v = ranked.Single(r => r.CvId == "VOID");
+        Assert.Equal(ranked.Count, v.Rank);
+        Assert.True(v.HasMustMissing);
+        Assert.InRange(v.Score, 0, 100);
+    }
+
+    [Fact]
+    public void Rank_ZeroSumWeights_ScoresZeroButKeepsOrder()
+    {
+        var ranker = new Bm25Ranker();
+        var offer = SampleOffer() with
+        {
+            Weights = new ScoringWeights(Must: 0, Bm25: 0, Nice: 0, Experience: 0, Education: 0, Title: 0, Languages: 0)
+        };
+
+        var ranked = ranker.Rank(offer, SampleCvs());
+
+        Assert.Equal(6, ranked.Count);
+        Assert.All(ranked, r => Assert.Equal(0, r.Score));
+    }
 }

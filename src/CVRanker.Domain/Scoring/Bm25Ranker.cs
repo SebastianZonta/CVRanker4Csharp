@@ -19,8 +19,8 @@ public sealed class Bm25Ranker(double k1 = 1.2, double b = 0.75) : IRanker
             return [];
 
         var weights = offer.EffectiveWeights;
-        var must = NormalizeList(offer.MustHave);
-        var nice = NormalizeList(offer.NiceToHave);
+        var must = NormalizeEntries(offer.MustHave);
+        var nice = NormalizeEntries(offer.NiceToHave);
 
         var queryTokens = TextTokenizer.Tokenize(offer.JobDescription);
         var queryTerms = new HashSet<string>(queryTokens, StringComparer.Ordinal);
@@ -37,9 +37,9 @@ public sealed class Bm25Ranker(double k1 = 1.2, double b = 0.75) : IRanker
             var cv = list[i];
             var docSet = new HashSet<string>(docTokens[i], StringComparer.Ordinal);
 
-            var mustHit = must.Where(m => docSet.Contains(m)).ToList();
-            var niceHit = nice.Where(n => docSet.Contains(n)).ToList();
-            var missing = must.Where(m => !docSet.Contains(m)).ToList();
+            var mustHit = must.Where(m => m.IsCoveredBy(docSet)).ToList();
+            var niceHit = nice.Where(n => n.IsCoveredBy(docSet)).ToList();
+            var missing = must.Where(m => !m.IsCoveredBy(docSet)).Select(m => m.Display).ToList();
 
             double mustF = must.Count == 0 ? 0 : (double)mustHit.Count / must.Count;
             double niceF = nice.Count == 0 ? 0 : (double)niceHit.Count / nice.Count;
@@ -48,7 +48,7 @@ public sealed class Bm25Ranker(double k1 = 1.2, double b = 0.75) : IRanker
                 Must: mustF,
                 Bm25: rawBm25[i] / maxBm25,
                 Nice: niceF,
-                Experience: Math.Min(cv.ExperienceYears / 10.0, 1.0),
+                Experience: Math.Clamp(cv.ExperienceYears / 10.0, 0, 1.0),
                 Education: cv.HasDegree ? 1 : 0,
                 Title: cv.IsSenior ? 1 : 0,
                 Languages: cv.HasLanguage ? 1 : 0);
@@ -57,8 +57,8 @@ public sealed class Bm25Ranker(double k1 = 1.2, double b = 0.75) : IRanker
             double wsum = weights.Sum;
             double score = wsum <= 0 ? 0 : 100.0 * weighted / wsum;
 
-            var reasons = mustHit.Select(h => $"must:{h}")
-                .Concat(niceHit.Select(h => $"nice:{h}"))
+            var reasons = mustHit.Select(h => $"must:{h.Display}")
+                .Concat(niceHit.Select(h => $"nice:{h.Display}"))
                 .Append($"exp:{TrimYears(cv.ExperienceYears)}y")
                 .Append(cv.HasDegree ? "degree" : "no-degree")
                 .Take(3)
@@ -96,8 +96,28 @@ public sealed class Bm25Ranker(double k1 = 1.2, double b = 0.75) : IRanker
         return s;
     }
 
-    private static List<string> NormalizeList(IEnumerable<string>? items) =>
-        (items ?? []).Select(s => s.Trim().ToLowerInvariant()).Where(s => s.Length > 0).ToList();
+    // Single normalization path for Offer entries: same tokenizer as CV text,
+    // plus trailing-period trim so HR-typed "C#." matches CV term "c#".
+    // Doc side keeps raw tokenizer output (prototype scorer-v1 fidelity).
+    private static List<EntryTerms> NormalizeEntries(IEnumerable<string>? items) =>
+        (items ?? [])
+            .Select(item => EntryTerms.From(item))
+            .Where(e => e.Tokens.Count > 0)
+            .ToList();
+
+    private sealed record EntryTerms(string Display, IReadOnlyList<string> Tokens)
+    {
+        public bool IsCoveredBy(HashSet<string> docSet) => Tokens.All(docSet.Contains);
+
+        public static EntryTerms From(string item)
+        {
+            var tokens = TextTokenizer.Tokenize(item)
+                .Select(t => t.TrimEnd('.'))
+                .Where(t => t.Length > 0)
+                .ToList();
+            return new EntryTerms(string.Join(' ', tokens), tokens);
+        }
+    }
 
     private static string TrimYears(double years) =>
         Math.Abs(years - Math.Round(years)) < 1e-9 ? ((int)Math.Round(years)).ToString() : years.ToString("0.#");

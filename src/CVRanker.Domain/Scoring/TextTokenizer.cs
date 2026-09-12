@@ -15,6 +15,4 @@ internal static partial class TextTokenizer
         var cleaned = NonTokenChars().Replace(lowered, " ");
         return cleaned.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries).ToList();
     }
-
-    public static HashSet<string> TokenSet(string text) => new(Tokenize(text), StringComparer.Ordinal);
 }
