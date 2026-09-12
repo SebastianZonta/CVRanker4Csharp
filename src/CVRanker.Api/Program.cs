@@ -1,3 +1,4 @@
+using CVRanker.Domain;
 using CVRanker;
 
 var builder = WebApplication.CreateBuilder(args);

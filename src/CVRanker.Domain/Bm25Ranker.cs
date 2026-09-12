@@ -1,4 +1,4 @@
-namespace CVRanker;
+namespace CVRanker.Domain;
 
 /// <summary>
 /// v1 scorer lifted from prototype/scorer-v1.html:

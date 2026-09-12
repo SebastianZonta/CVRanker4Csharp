@@ -1,3 +1,4 @@
+using CVRanker.Domain;
 namespace CVRanker;
 
 /// <summary>HR ranking view: anonymized by construction (opaque refs, no PII fields exist to leak).</summary>

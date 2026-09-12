@@ -1,4 +1,4 @@
-namespace CVRanker;
+namespace CVRanker.Domain;
 
 /// <summary>Per-section features in [0,1], intra-offer normalized.</summary>
 public sealed record FeatureBreakdown(

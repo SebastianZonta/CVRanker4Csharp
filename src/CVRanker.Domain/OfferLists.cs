@@ -1,4 +1,4 @@
-namespace CVRanker;
+namespace CVRanker.Domain;
 
 /// <summary>Editable offer lists: one item per line, blanks ignored.</summary>
 public static class OfferLists

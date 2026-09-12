@@ -1,4 +1,4 @@
-namespace CVRanker;
+namespace CVRanker.Domain;
 
 /// <summary>v1 default weights from the prototype scorer-v1.html.</summary>
 public sealed record ScoringWeights(

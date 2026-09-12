@@ -1,3 +1,4 @@
+using CVRanker.Domain;
 using UglyToad.PdfPig;
 
 namespace CVRanker;

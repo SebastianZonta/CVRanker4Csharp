@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace CVRanker;
+namespace CVRanker.Domain;
 
 internal static partial class TextTokenizer
 {

@@ -1,4 +1,4 @@
-namespace CVRanker;
+namespace CVRanker.Domain;
 
 /// <summary>Blind review set: top-N + hired + randoms, shuffled with a seed so HR judges without scores or order.</summary>
 public static class BlindReviewSet

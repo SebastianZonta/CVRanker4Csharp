@@ -1,3 +1,4 @@
+using CVRanker.Domain;
 namespace CVRanker;
 
 public sealed record PdfExtractionResult(

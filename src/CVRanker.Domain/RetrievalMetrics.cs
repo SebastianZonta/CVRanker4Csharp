@@ -1,4 +1,4 @@
-namespace CVRanker;
+namespace CVRanker.Domain;
 
 /// <summary>Standard retrieval metrics over a frozen ranking. Binary relevance = grade &gt; 0 (grades valid 0-3; other values count as non-relevant).</summary>
 public static class RetrievalMetrics

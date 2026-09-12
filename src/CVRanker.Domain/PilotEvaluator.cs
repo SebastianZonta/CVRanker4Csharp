@@ -1,4 +1,4 @@
-namespace CVRanker;
+namespace CVRanker.Domain;
 
 public sealed record PilotResult(
     bool HiredInTop10,

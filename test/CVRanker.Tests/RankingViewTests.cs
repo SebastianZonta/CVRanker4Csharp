@@ -1,3 +1,4 @@
+using CVRanker.Domain;
 using System.Text.Json;
 
 namespace CVRanker.Tests;

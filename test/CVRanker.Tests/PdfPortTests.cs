@@ -1,3 +1,4 @@
+using CVRanker.Domain;
 namespace CVRanker.Tests;
 
 public sealed class PdfPortTests
