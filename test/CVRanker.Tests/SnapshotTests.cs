@@ -1,10 +1,18 @@
-using CVRanker.Application;
 using CVRanker.Infrastructure;
 using CVRanker.Domain;
 namespace CVRanker.Tests;
 
 public sealed class SnapshotTests
 {
+    private static RankingSnapshot Rank(Offer offer, IReadOnlyList<CandidateCv> cvs, InMemorySnapshotStore store)
+    {
+        var frozenCvs = cvs.ToList();
+        var results = new Bm25Ranker().Rank(offer, frozenCvs).ToList();
+        var snapshot = RankingSnapshot.Create(offer, frozenCvs, results, Bm25Ranker.ScorerVersion);
+        store.Save(snapshot);
+        return snapshot;
+    }
+
     private static Offer SampleOffer() => new(
         "Senior backend engineer. Build C# .NET services on Azure, SQL Server, REST APIs.",
         ["c#", ".net", "rest", "sql"],
@@ -28,9 +36,7 @@ public sealed class SnapshotTests
     [Fact]
     public void Rank_FreezesSnapshotWithInputsVersionAndResults()
     {
-        var service = new RankingService(new Bm25Ranker(), new InMemorySnapshotStore());
-
-        var snapshot = service.Rank(SampleOffer(), SampleCvs());
+        var snapshot = Rank(SampleOffer(), SampleCvs(), new InMemorySnapshotStore());
 
         Assert.Equal(SampleOffer().JobDescription, snapshot.Offer.JobDescription);
         Assert.Equal(SampleOffer().MustHave, snapshot.Offer.MustHave);
@@ -46,12 +52,11 @@ public sealed class SnapshotTests
     [Fact]
     public void Snapshot_IsFrozen_LaterMutationsDoNotLeakIn()
     {
-        var service = new RankingService(new Bm25Ranker(), new InMemorySnapshotStore());
         var must = new List<string> { "c#", ".net", "rest", "sql" };
         var cvs = new List<CandidateCv>(SampleCvs());
         var offer = SampleOffer() with { MustHave = must };
 
-        var snapshot = service.Rank(offer, cvs);
+        var snapshot = Rank(offer, cvs, new InMemorySnapshotStore());
         must.Clear();
         cvs.Clear();
 
@@ -64,9 +69,8 @@ public sealed class SnapshotTests
     public void Snapshot_ReproducesSameRankingAPosteriori()
     {
         var store = new InMemorySnapshotStore();
-        var service = new RankingService(new Bm25Ranker(), store);
 
-        var snapshot = service.Rank(SampleOffer(), SampleCvs());
+        var snapshot = Rank(SampleOffer(), SampleCvs(), store);
         var reloaded = store.Get(snapshot.Id);
         var rerun = new Bm25Ranker().Rank(reloaded.Offer, reloaded.Cvs);
 

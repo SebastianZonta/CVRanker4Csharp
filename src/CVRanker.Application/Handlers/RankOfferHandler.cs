@@ -10,10 +10,9 @@ public sealed class RankOfferHandler(
     IRanker ranker,
     ISnapshotStore store,
     IPdfTextExtractor extractor,
-    IPdfStore pdfs)
+    IPdfStore pdfs,
+    string scorerVersion = Bm25Ranker.ScorerVersion)
 {
-    private readonly RankingService _service = new(ranker, store);
-
     public RankResponse Handle(RankRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -31,7 +30,12 @@ public sealed class RankOfferHandler(
             }
             cvs.Add(OfferMapper.ToCandidate(entry, extractor.Extract(pdf).Text));
         }
-        var snapshot = _service.Rank(OfferMapper.ToOffer(request), cvs);
+        var offer = OfferMapper.ToOffer(request);
+        var frozenCvs = cvs.ToList();
+        var results = ranker.Rank(offer, frozenCvs).ToList();
+
+        var snapshot = RankingSnapshot.Create(offer, frozenCvs, results, scorerVersion);
+        store.Save(snapshot);
         return new RankResponse(snapshot.Id);
     }
 }

@@ -1,6 +1,5 @@
 using CVRanker.Application.Mappers;
 using CVRanker.Infrastructure;
-using CVRanker.Application;
 using CVRanker.Contracts.Responses.Rankings;
 using CVRanker.Domain;
 using System.Text.Json;
@@ -11,7 +10,6 @@ public sealed class RankingViewTests
 {
     private static RankingSnapshot SampleSnapshot()
     {
-        var service = new RankingService(new Bm25Ranker(), new InMemorySnapshotStore());
         var offer = new Offer(
             "Senior backend engineer with C# .NET REST SQL Azure",
             ["c#", ".net", "rest", "sql"],
@@ -23,7 +21,16 @@ public sealed class RankingViewTests
             new("B", "Java backend engineer, 6 years, Spring, REST, PostgreSQL, AWS, English.", 6, HasDegree: true, IsSenior: true, HasLanguage: true),
             new("C", "Junior C# .NET developer, 1 year, REST, SQL basics, Spanish only.", 1, HasDegree: true, IsSenior: false, HasLanguage: false),
         };
-        return service.Rank(offer, cvs);
+        return Rank(offer, cvs, new InMemorySnapshotStore());
+    }
+
+    private static RankingSnapshot Rank(Offer offer, IReadOnlyList<CandidateCv> cvs, InMemorySnapshotStore store)
+    {
+        var frozenCvs = cvs.ToList();
+        var results = new Bm25Ranker().Rank(offer, frozenCvs).ToList();
+        var snapshot = RankingSnapshot.Create(offer, frozenCvs, results, Bm25Ranker.ScorerVersion);
+        store.Save(snapshot);
+        return snapshot;
     }
 
     [Fact]
