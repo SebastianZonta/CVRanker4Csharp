@@ -24,11 +24,15 @@ public sealed record RankingSnapshot(
             MustHave = offer.MustHave.ToList(),
             NiceToHave = offer.NiceToHave.ToList(),
         };
+        var frozenCvs = cvs.Select(c => c.Ocr is null ? c : c with
+        {
+            Ocr = c.Ocr with { ConfidenceByPage = new Dictionary<int, float>(c.Ocr.ConfidenceByPage) },
+        }).ToList();
         return new RankingSnapshot(
             Guid.NewGuid().ToString("N"),
             DateTimeOffset.UtcNow,
             frozenOffer,
-            cvs.ToList(),
+            frozenCvs,
             results.ToList(),
             scorerVersion);
     }

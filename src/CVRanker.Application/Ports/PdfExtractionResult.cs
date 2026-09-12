@@ -5,7 +5,10 @@ public sealed record PdfExtractionResult(
     string Text,
     IReadOnlyList<string> PageTexts,
     int PageCount,
-    IReadOnlyList<int> PagesWithoutText)
+    IReadOnlyList<int> PagesWithoutText,
+    string? OcrEngine = null,
+    string? OcrVersion = null,
+    IReadOnlyDictionary<int, float>? OcrConfidenceByPage = null)
 {
     public bool NeedsOcr => PagesWithoutText.Count > 0;
 }

@@ -66,6 +66,27 @@ public sealed class SnapshotTests
     }
 
     [Fact]
+    public void Snapshot_FreezesOcrProvenance_LaterMutationsDoNotLeakIn()
+    {
+        var confidences = new Dictionary<int, float> { [1] = 0.9f };
+        var cvs = new List<CandidateCv>
+        {
+            new("A", "scanned text", 8, HasDegree: true, IsSenior: true, HasLanguage: true,
+                Ocr: new OcrProvenance("tesseract", "5.2.0", confidences)),
+        };
+        var snapshot = RankingSnapshot.Create(
+            SampleOffer(), cvs, new Bm25Ranker().Rank(SampleOffer(), cvs).ToList(), Bm25Ranker.ScorerVersion);
+
+        confidences[1] = 0.1f;
+        confidences[2] = 0.2f;
+
+        var ocr = snapshot.Cvs[0].Ocr;
+        Assert.NotNull(ocr);
+        Assert.Equal("tesseract", ocr!.Engine);
+        Assert.Equal(0.9f, Assert.Single(ocr.ConfidenceByPage).Value);
+    }
+
+    [Fact]
     public void Snapshot_ReproducesSameRankingAPosteriori()
     {
         var store = new InMemorySnapshotStore();

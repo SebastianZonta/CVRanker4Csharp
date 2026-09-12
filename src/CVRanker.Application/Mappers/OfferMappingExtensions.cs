@@ -16,10 +16,10 @@ public static class OfferMappingExtensions
         return new Offer(request.JobDescription, request.MustHave.ToList(), request.NiceToHave.ToList(), weights);
     }
 
-    public static CandidateCv ToCandidate(this CvEntry entry, string text)
+    public static CandidateCv ToCandidate(this CvEntry entry, string text, OcrProvenance? ocr = null)
     {
         ArgumentNullException.ThrowIfNull(entry);
         return new CandidateCv(entry.Ref, text, entry.ExperienceYears,
-            entry.HasDegree, entry.IsSenior, entry.HasLanguage);
+            entry.HasDegree, entry.IsSenior, entry.HasLanguage, ocr);
     }
 }

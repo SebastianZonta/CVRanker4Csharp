@@ -36,6 +36,14 @@ _Avoid_: score, rating
 HR judging candidates without seeing scores, order, or identity.
 _Avoid_: blind pilot (the evaluation round, not the act of judging)
 
+**Scanned CV**:
+A CV PDF page without a text layer, requiring OCR extraction before scoring.
+_Avoid_: scanned pdf, image CV
+
+**OCR extraction**:
+Deriving CV text from scanned pages, with engine, version, and per-page confidence frozen for audit.
+_Avoid_: OCR queue, OCR fallback
+
 **Triage saving**:
 The fraction of the CV set HR does not need to read because of the ranking.
 _Avoid_: time saved, efficiency

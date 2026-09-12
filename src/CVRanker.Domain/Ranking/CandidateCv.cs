@@ -7,4 +7,5 @@ public sealed record CandidateCv(
     double ExperienceYears,
     bool HasDegree,
     bool IsSenior,
-    bool HasLanguage);
+    bool HasLanguage,
+    OcrProvenance? Ocr = null);

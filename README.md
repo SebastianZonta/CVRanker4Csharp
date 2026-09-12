@@ -12,15 +12,18 @@ No paid LLM APIs. Scoring is a weighted hybrid lifted from `prototype/scorer-v1.
 |---|---|---|
 | `src/CVRanker.Domain` | Ranking aggregate, scorer (`IRanker` seam), metrics + calibration. References nothing | — |
 | `src/CVRanker.Contracts` | HTTP DTOs: `Requests/<entity>/`, `Responses/<entity>/`. References nothing | — |
-| `src/CVRanker.Application` | Ports, 3 handlers (`RankOffer`/`GetRanking`/`GetCandidatePdf`), Contracts↔Domain mappers as extension methods (`request.ToOffer()`, `snapshot.ToRankingView(...)`), `AddApplication()` | Domain, Contracts |
-| `src/CVRanker.Infrastructure` | Adapters (PdfPig extraction, PDF/file stores), `AddInfrastructure(config)` | Application |
+| `src/CVRanker.Application` | Ports, 4 handlers (`RankOffer`/`GetRanking`/`GetCandidatePdf`/`ListSnapshots`), Contracts↔Domain mappers as extension methods (`request.ToOffer()`, `snapshot.ToRankingView(...)`), `AddApplication()` | Domain, Contracts |
+| `src/CVRanker.Infrastructure` | Adapters (PdfPig extraction, Tesseract OCR for scanned pages, PDF/file stores), `AddInfrastructure(config)` | Application |
 | `src/CVRanker.Api` | Minimal API: thin endpoints over handlers (composition root) | Application, Infrastructure, Contracts |
-| `test/CVRanker.Tests` | 26 unit/behavior tests + PDF fixtures in `Fixtures/` | — |
+| `test/CVRanker.Tests` | 41 unit/behavior tests + PDF fixtures in `Fixtures/` | — |
 | `test/CVRanker.Api.Tests` | 4 endpoint integration tests (in-memory server) | — |
 
 ## Prerequisites
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download) (`dotnet --version` → `10.x`)
+- `tesseract-ocr` 5.x with English data (only needed for scanned PDFs; native-text PDFs work without it):
+  `sudo apt-get install -y tesseract-ocr tesseract-ocr-eng`. The app pins `tessdata/eng` shipped in
+  `src/CVRanker.Infrastructure/tessdata` via `--tessdata-dir` (`Ocr:TessDataPath` overrides).
 
 ## Verify everything works
 
