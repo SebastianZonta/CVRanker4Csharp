@@ -2,7 +2,6 @@ using CVRanker.Contracts.Responses.Rankings;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
-using CVRanker;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Hosting;
 

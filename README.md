@@ -8,12 +8,15 @@ No paid LLM APIs. Scoring is a weighted hybrid lifted from `prototype/scorer-v1.
 
 ## Layout
 
-| Project | What |
-|---|---|
-| `src/CVRanker` | Library: scorer (`IRanker` seam), PdfPig port, snapshots, HR view, blind-pilot metrics + calibration |
-| `src/CVRanker.Api` | Minimal API: rank over a frozen snapshot, filtered HR view, blind-phase PDF serving |
-| `test/CVRanker.Tests` | 26 unit/behavior tests + PDF fixtures in `Fixtures/` |
-| `test/CVRanker.Api.Tests` | 4 endpoint integration tests (in-memory server) |
+| Project | What | Depends on |
+|---|---|---|
+| `src/CVRanker.Domain` | Ranking aggregate, scorer (`IRanker` seam), metrics + calibration. References nothing | — |
+| `src/CVRanker.Contracts` | HTTP DTOs: `Requests/<entity>/`, `Responses/<entity>/`. References nothing | — |
+| `src/CVRanker.Application` | Ports, 3 CQRS handlers, Contracts↔Domain mappers, `AddApplication()` | Domain, Contracts |
+| `src/CVRanker.Infrastructure` | Adapters (PdfPig extraction, PDF/file stores), `AddInfrastructure(config)` | Application |
+| `src/CVRanker.Api` | Minimal API: thin endpoints over handlers (composition root) | Application, Infrastructure, Contracts |
+| `test/CVRanker.Tests` | 26 unit/behavior tests + PDF fixtures in `Fixtures/` | — |
+| `test/CVRanker.Api.Tests` | 4 endpoint integration tests (in-memory server) | — |
 
 ## Prerequisites
 
